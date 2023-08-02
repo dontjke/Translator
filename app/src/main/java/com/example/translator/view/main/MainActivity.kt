@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.translator.R
@@ -25,13 +24,6 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
     override lateinit var model: MainViewModel
 
-
-    /*override val model: MainViewModel by lazy {
-        ViewModelProvider.NewInstanceFactory().create(MainViewModel::class.java)
-    }*/
-    private val observer = Observer<AppState> { renderData(it) }
-
-
     private lateinit var binding: ActivityMainBinding
     private var adapter: MainAdapter? = null
 
@@ -51,7 +43,8 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
         model = viewModelFactory.create(MainViewModel::class.java)
         model.subscribe().observe(this@MainActivity) {
-            renderData(it) }
+            renderData(it)
+        }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -60,7 +53,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
             searchDialogFragment.setOnSearchClickListener(object :
                 SearchDialogFragment.OnSearchClickListener {
                 override fun onClick(searchWord: String) {
-                    model.getData(searchWord,true)
+                    model.getData(searchWord, true)
                 }
             })
             searchDialogFragment.show(

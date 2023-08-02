@@ -1,6 +1,7 @@
 package com.example.translator.viewmodel
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
 import com.example.translator.model.data.AppState
 import com.example.translator.view.main.MainInteractor
 import io.reactivex.rxjava3.disposables.Disposable
@@ -10,7 +11,7 @@ import javax.inject.Inject
 
 class MainViewModel
 @Inject constructor(
-    private val interactor: MainInteractor
+    private val interactor: MainInteractor,
 ) : BaseViewModel<AppState>() {
 
     private var appState: AppState? = null
