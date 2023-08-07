@@ -2,7 +2,8 @@ package com.example.translator.model.repository
 
 import com.example.translator.model.data.DataModel
 import com.example.translator.model.datasource.DataSource
-import io.reactivex.Observable
+import io.reactivex.rxjava3.core.Observable
+
 
 class RepositoryImplementation(private val dataSource: DataSource<List<DataModel>>) :
     Repository<List<DataModel>> {
