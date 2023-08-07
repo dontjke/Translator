@@ -1,10 +1,10 @@
 package com.example.translator.view.main
 
+
 import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.translator.R
 import com.example.translator.databinding.ActivityMainBinding
@@ -12,15 +12,12 @@ import com.example.translator.model.data.AppState
 import com.example.translator.model.data.DataModel
 import com.example.translator.view.base.BaseActivity
 import com.example.translator.view.main.adapter.MainAdapter
+import com.example.translator.viewmodel.MainInteractor
 import com.example.translator.viewmodel.MainViewModel
-import dagger.android.AndroidInjection
-import javax.inject.Inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class MainActivity : BaseActivity<AppState, MainInteractor>() {
-
-    @Inject
-    internal lateinit var viewModelFactory: ViewModelProvider.Factory
 
     override lateinit var model: MainViewModel
 
@@ -31,23 +28,16 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         object : MainAdapter.OnListItemClickListener {
             override fun onItemClick(data: DataModel) {
                 Toast.makeText(
-                    this@MainActivity, data.text,
-                    Toast.LENGTH_SHORT
+                    this@MainActivity, data.text, Toast.LENGTH_SHORT
                 ).show()
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
-
-        model = viewModelFactory.create(MainViewModel::class.java)
-        model.subscribe().observe(this@MainActivity) {
-            renderData(it)
-        }
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        initViewModel()
         binding.searchFab.setOnClickListener {
             val searchDialogFragment = SearchDialogFragment.newInstance()
             searchDialogFragment.setOnSearchClickListener(object :
@@ -57,9 +47,19 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
                 }
             })
             searchDialogFragment.show(
-                supportFragmentManager,
-                BOTTOM_SHEET_FRAGMENT_DIALOG_TAG
+                supportFragmentManager, BOTTOM_SHEET_FRAGMENT_DIALOG_TAG
             )
+        }
+    }
+
+    private fun initViewModel() {
+        if (binding.mainActivityRecyclerview.adapter != null) {
+            throw IllegalStateException("Initiate ViewModel first")
+        }
+        val viewModel: MainViewModel by viewModel()
+        model = viewModel
+        model.subscribe().observe(this@MainActivity) {
+            renderData(it)
         }
     }
 

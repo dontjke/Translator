@@ -1,49 +1,81 @@
 package com.example.translator.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.SavedStateHandle
 import com.example.translator.model.data.AppState
-import com.example.translator.view.main.MainInteractor
-import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.observers.DisposableObserver
+import com.example.translator.model.data.DataModel
+import com.example.translator.model.data.Meanings
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-import javax.inject.Inject
+class MainViewModel(private val interactor: MainInteractor) :
+    BaseViewModel<AppState>() {
 
-class MainViewModel
-@Inject constructor(
-    private val interactor: MainInteractor,
-) : BaseViewModel<AppState>() {
-
-    private var appState: AppState? = null
-    fun subscribe(): LiveData<AppState> = liveDataForViewToObserve
-
-    override fun getData(word: String, isOnline: Boolean) {
-        compositeDisposable.add(
-            interactor.getData(word, isOnline)
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.ui())
-                .doOnSubscribe(doOnSubscribe())
-                .subscribeWith(getObserver())
-        )
+    private val liveDataForViewToObserve: LiveData<AppState> = mutableLiveData
+    fun subscribe(): LiveData<AppState> {
+        return liveDataForViewToObserve
     }
 
-    private fun doOnSubscribe(): (Disposable) -> Unit =
-        { liveDataForViewToObserve.value = AppState.Loading(null) }
+    override fun getData(word: String, isOnline: Boolean) {
+        mutableLiveData.value = AppState.Loading(null)
+        cancelJob()
+        viewModelCoroutineScope.launch { startInteractor(word, isOnline) }
+    }
 
-    private fun getObserver(): DisposableObserver<AppState> {
-        return object : DisposableObserver<AppState>() {
-            override fun onNext(state: AppState) {
-                appState = state
-                liveDataForViewToObserve.value = state
+    private suspend fun startInteractor(word: String, isOnline: Boolean) =
+        withContext(Dispatchers.IO) {
+            mutableLiveData.postValue(
+                parseSearchResults(
+                    interactor.getData(
+                        word,
+                        isOnline
+                    )
+                )
+            )
+        }
+
+    override fun handleError(error: Throwable) {
+        mutableLiveData.postValue(AppState.Error(error))
+    }
+
+    override fun onCleared() {
+        mutableLiveData.value = AppState.Success(null)
+        super.onCleared()
+    }
+
+    private fun parseSearchResults(data: AppState): AppState {
+        val newSearchResults = arrayListOf<DataModel>()
+        when (data) {
+            is AppState.Success -> {
+                val searchResults = data.data
+                if (!searchResults.isNullOrEmpty()) {
+                    for (searchResult in searchResults) {
+                        parseResult(searchResult, newSearchResults)
+                    }
+                }
             }
 
-            override fun onError(e: Throwable) {
-                liveDataForViewToObserve.value = AppState.Error(e)
-            }
+            else -> println("error")
+        }
 
-            override fun onComplete() {
+        return AppState.Success(newSearchResults)
+    }
+
+    private fun parseResult(dataModel: DataModel, newDataModels: ArrayList<DataModel>) {
+        if (!dataModel.text.isNullOrBlank() && !dataModel.meanings.isNullOrEmpty()) {
+            val newMeanings = arrayListOf<Meanings>()
+            for (meaning in dataModel.meanings) {
+                if (meaning.translation != null && !meaning.translation.translation.isNullOrBlank()) {
+                    newMeanings.add(Meanings(meaning.translation, meaning.imageUrl))
+                }
+            }
+            if (newMeanings.isNotEmpty()) {
+                newDataModels.add(DataModel(dataModel.text, newMeanings))
             }
         }
     }
 }
+
+
+
 
