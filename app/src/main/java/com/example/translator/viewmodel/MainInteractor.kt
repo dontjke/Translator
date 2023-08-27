@@ -3,9 +3,9 @@ package com.example.translator.viewmodel
 import com.example.translator.model.data.AppState
 import com.example.translator.model.data.DataModel
 import com.example.translator.model.repository.Repository
-import javax.inject.Inject
 
-class MainInteractor @Inject constructor(
+
+class MainInteractor constructor(
     private val remoteRepository: Repository<List<DataModel>>,
     private val localRepository: Repository<List<DataModel>>
 ) : Interactor<AppState> {

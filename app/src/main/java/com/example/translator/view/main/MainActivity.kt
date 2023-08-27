@@ -6,6 +6,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.translator.BuildConfig
 import com.example.translator.R
 import com.example.translator.databinding.ActivityMainBinding
 import com.example.translator.model.data.AppState
@@ -47,7 +48,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
                 }
             })
             searchDialogFragment.show(
-                supportFragmentManager, BOTTOM_SHEET_FRAGMENT_DIALOG_TAG
+                supportFragmentManager, BuildConfig.BOTTOM_SHEET_FRAGMENT_DIALOG_TAG
             )
         }
     }
@@ -125,10 +126,5 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         binding.successLinearLayout.visibility = GONE
         binding.loadingFrameLayout.visibility = GONE
         binding.errorLinearLayout.visibility = VISIBLE
-    }
-
-    companion object {
-        private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG =
-            "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
     }
 }

@@ -26,7 +26,15 @@ android {
         }
     }
 
+    buildTypes.each {
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file("app.properties").newDataInputStream())
+        def bottomSheetFragmentDialogTag = properties.getProperty("BOTTOM_SHEET_FRAGMENT_DIALOG_TAG", "")
+        it.buildConfigField "String", "BOTTOM_SHEET_FRAGMENT_DIALOG_TAG", bottomSheetFragmentDialogTag
+    }
+
     buildFeatures {
+        buildConfig = true
         viewBinding true
     }
 
@@ -66,13 +74,6 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-
-    // Dagger
-    implementation 'com.google.dagger:dagger:2.47'
-    implementation 'com.google.dagger:dagger-android:2.47'
-    implementation 'com.google.dagger:dagger-android-support:2.47'
-    kapt 'com.google.dagger:dagger-android-processor:2.47'
-    kapt 'com.google.dagger:dagger-compiler:2.47'
 
     //Koin
     implementation "io.insert-koin:koin-core:3.1.2"
