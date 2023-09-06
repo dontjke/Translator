@@ -2,7 +2,7 @@ package com.example.translator.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.translator.model.data.AppState
+import com.example.translator.model.AppState
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +12,7 @@ import kotlinx.coroutines.cancelChildren
 
 abstract class BaseViewModel<T : AppState>(
 
-    protected open val mutableLiveData: MutableLiveData<T> =
+    protected open val _mutableLiveData: MutableLiveData<T> =
         MutableLiveData()
 ) : ViewModel() {
     protected val viewModelCoroutineScope = CoroutineScope(
@@ -25,6 +25,7 @@ abstract class BaseViewModel<T : AppState>(
 
     abstract fun getData(word: String, isOnline: Boolean)
     override fun onCleared() {
+        super.onCleared()
         cancelJob()
     }
 
