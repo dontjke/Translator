@@ -1,36 +1,63 @@
 package com.example.translator.view.main
 
-
+import android.content.Intent
 import android.os.Bundle
-import android.view.View.GONE
-import android.view.View.VISIBLE
-import android.widget.Toast
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.translator.BuildConfig
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import androidx.lifecycle.Observer
+import com.example.translator.BuildConfig.BOTTOM_SHEET_FRAGMENT_DIALOG_TAG
 import com.example.translator.R
 import com.example.translator.databinding.ActivityMainBinding
-import com.example.translator.model.data.AppState
+import com.example.translator.model.AppState
 import com.example.translator.model.data.DataModel
+import com.example.translator.utils.network.isOnline
+import com.example.translator.utils.ui.convertMeaningsToString
 import com.example.translator.view.base.BaseActivity
+import com.example.translator.view.description.DescriptionActivity
+import com.example.translator.view.history.HistoryActivity
 import com.example.translator.view.main.adapter.MainAdapter
-import com.example.translator.viewmodel.MainInteractor
-import com.example.translator.viewmodel.MainViewModel
+import com.example.translator.viewmodel.main.MainInteractor
+import com.example.translator.viewmodel.main.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
-    override lateinit var model: MainViewModel
-
     private lateinit var binding: ActivityMainBinding
-    private var adapter: MainAdapter? = null
+    override lateinit var model: MainViewModel
+    private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
 
-    private val onListItemClickListener: MainAdapter.OnListItemClickListener =
-        object : MainAdapter.OnListItemClickListener {
+    private val fabClickListener: View.OnClickListener =
+        View.OnClickListener {
+            val searchDialogFragment = SearchDialogFragment.newInstance()
+            searchDialogFragment.setOnSearchClickListener(onSearchClickListener)
+            searchDialogFragment.show(supportFragmentManager, BOTTOM_SHEET_FRAGMENT_DIALOG_TAG)
+        }
+
+    private val onListItemClickListener: OnListItemClickListener =
+        object : OnListItemClickListener {
             override fun onItemClick(data: DataModel) {
-                Toast.makeText(
-                    this@MainActivity, data.text, Toast.LENGTH_SHORT
-                ).show()
+                startActivity(
+                    DescriptionActivity.getIntent(
+                        this@MainActivity,
+                        data.text!!,
+                        convertMeaningsToString(data.meanings!!),
+                        data.meanings[0].imageUrl
+                    )
+                )
+            }
+        }
+
+    private val onSearchClickListener: SearchDialogFragment.OnSearchClickListener =
+        object : SearchDialogFragment.OnSearchClickListener {
+            override fun onClick(searchWord: String) {
+                isNetworkAvailable = isOnline(applicationContext)
+                if (isNetworkAvailable) {
+                    model.getData(searchWord, isNetworkAvailable)
+                } else {
+                    showNoInternetConnectionDialog()
+                }
             }
         }
 
@@ -38,93 +65,43 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        initViewModel()
-        binding.searchFab.setOnClickListener {
-            val searchDialogFragment = SearchDialogFragment.newInstance()
-            searchDialogFragment.setOnSearchClickListener(object :
-                SearchDialogFragment.OnSearchClickListener {
-                override fun onClick(searchWord: String) {
-                    model.getData(searchWord, true)
-                }
-            })
-            searchDialogFragment.show(
-                supportFragmentManager, BuildConfig.BOTTOM_SHEET_FRAGMENT_DIALOG_TAG
-            )
+
+        iniViewModel()
+        initViews()
+    }
+
+    override fun setDataToAdapter(data: List<DataModel>) {
+        adapter.setData(data)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.history_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_history -> {
+                startActivity(Intent(this, HistoryActivity::class.java))
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun initViewModel() {
+    private fun iniViewModel() {
         if (binding.mainActivityRecyclerview.adapter != null) {
-            throw IllegalStateException("Initiate ViewModel first")
+            throw IllegalStateException("The ViewModel should be initialised first")
         }
+
         val viewModel: MainViewModel by viewModel()
         model = viewModel
-        model.subscribe().observe(this@MainActivity) {
-            renderData(it)
-        }
+        model.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
     }
 
-    override fun renderData(appState: AppState) {
-        when (appState) {
-            is AppState.Success -> {
-                val dataModel = appState.data
-                if (dataModel.isNullOrEmpty()) {
-                    showErrorScreen(getString(R.string.empty_server_response_on_success))
-                } else {
-                    showViewSuccess()
-                    if (adapter == null) {
-                        binding.mainActivityRecyclerview.layoutManager =
-                            LinearLayoutManager(applicationContext)
-                        binding.mainActivityRecyclerview.adapter =
-                            MainAdapter(onListItemClickListener, dataModel)
-                    } else {
-                        adapter!!.setData(dataModel)
-                    }
-                }
-            }
-
-            is AppState.Loading -> {
-                showViewLoading()
-                if (appState.progress != null) {
-                    binding.progressBarHorizontal.visibility = VISIBLE
-                    binding.progressBarRound.visibility = GONE
-                    binding.progressBarHorizontal.progress = appState.progress
-                } else {
-                    binding.progressBarHorizontal.visibility = GONE
-                    binding.progressBarRound.visibility = VISIBLE
-                }
-            }
-
-            is AppState.Error -> {
-                showErrorScreen(appState.error.message)
-            }
-        }
-    }
-
-    private fun showErrorScreen(error: String?) {
-        showViewError()
-        binding.errorTextview.text = error ?: getString(R.string.undefined_error)
-        binding.reloadButton.setOnClickListener {
-            model.getData("hi", true)
-        }
-
-    }
-
-    private fun showViewSuccess() {
-        binding.successLinearLayout.visibility = VISIBLE
-        binding.loadingFrameLayout.visibility = GONE
-        binding.errorLinearLayout.visibility = GONE
-    }
-
-    private fun showViewLoading() {
-        binding.successLinearLayout.visibility = GONE
-        binding.loadingFrameLayout.visibility = VISIBLE
-        binding.errorLinearLayout.visibility = GONE
-    }
-
-    private fun showViewError() {
-        binding.successLinearLayout.visibility = GONE
-        binding.loadingFrameLayout.visibility = GONE
-        binding.errorLinearLayout.visibility = VISIBLE
+    private fun initViews() {
+        binding.searchFab.setOnClickListener(fabClickListener)
+        binding.mainActivityRecyclerview.adapter = adapter
     }
 }

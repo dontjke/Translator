@@ -2,19 +2,20 @@ package com.example.translator.view.main.adapter
 
 import android.view.LayoutInflater
 import android.view.View
-
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.translator.R
 import com.example.translator.model.data.DataModel
+import com.example.translator.view.main.OnListItemClickListener
 
 
 class MainAdapter(
-    private var onListItemClickListener: OnListItemClickListener,
-    private var data: List<DataModel>
+    private var onListItemClickListener: OnListItemClickListener
 ) :
     RecyclerView.Adapter<MainAdapter.RecyclerItemViewHolder>() {
+
+    private var data: List<DataModel> = arrayListOf()
     fun setData(data: List<DataModel>) {
         this.data = data
         notifyDataSetChanged()
@@ -52,7 +53,4 @@ class MainAdapter(
         onListItemClickListener.onItemClick(listItemData)
     }
 
-    interface OnListItemClickListener {
-        fun onItemClick(data: DataModel)
-    }
 }
