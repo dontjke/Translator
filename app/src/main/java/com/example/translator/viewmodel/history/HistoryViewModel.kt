@@ -1,38 +1,44 @@
 package com.example.translator.viewmodel.history
 
 import androidx.lifecycle.LiveData
-import com.example.translator.model.AppState
-import com.example.translator.utils.ui.parseLocalSearchResults
-import com.example.translator.viewmodel.BaseViewModel
+import com.example.repository.parseLocalSearchResults
+import com.example.core.viewmodel.BaseViewModel
 
 import kotlinx.coroutines.launch
 
 class HistoryViewModel(private val interactor: HistoryInteractor) :
-    BaseViewModel<AppState>() {
+    BaseViewModel<com.example.model.AppState>() {
 
-    private val liveDataForViewToObserve: LiveData<AppState> = _mutableLiveData
+    private val liveDataForViewToObserve: LiveData<com.example.model.AppState> = _mutableLiveData
 
     override fun onCleared() {
-        _mutableLiveData.value = AppState.Success(null)
+        _mutableLiveData.value = com.example.model.AppState.Success(null)
         super.onCleared()
     }
 
-    fun subscribe(): LiveData<AppState> {
+    fun subscribe(): LiveData<com.example.model.AppState> {
         return liveDataForViewToObserve
     }
 
     override fun getData(word: String, isOnline: Boolean) {
-        _mutableLiveData.value = AppState.Loading(null)
+        _mutableLiveData.value = com.example.model.AppState.Loading(null)
         cancelJob()
         viewModelCoroutineScope.launch { startInteractor(word, isOnline) }
 
     }
 
     private suspend fun startInteractor(word: String, isOnline: Boolean) {
-        _mutableLiveData.postValue(parseLocalSearchResults(interactor.getData(word, isOnline)))
+        _mutableLiveData.postValue(
+            com.example.repository.parseLocalSearchResults(
+                interactor.getData(
+                    word,
+                    isOnline
+                )
+            )
+        )
     }
 
     override fun handleError(error: Throwable) {
-        _mutableLiveData.postValue(AppState.Error(error))
+        _mutableLiveData.postValue(com.example.model.AppState.Error(error))
     }
 }
