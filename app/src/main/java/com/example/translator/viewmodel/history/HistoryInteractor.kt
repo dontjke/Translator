@@ -1,18 +1,17 @@
 package com.example.translator.viewmodel.history
 
-import com.example.translator.model.AppState
-import com.example.translator.model.data.DataModel
-import com.example.translator.model.repository.Repository
-import com.example.translator.model.repository.RepositoryLocal
-import com.example.translator.viewmodel.Interactor
+import com.example.model.data.DataModel
+import com.example.repository.Repository
+import com.example.repository.RepositoryLocal
+import com.example.core.viewmodel.Interactor
 
 
 class HistoryInteractor(
-    private val repositoryRemote: Repository<List<DataModel>>,
-    private val repositoryLocal: RepositoryLocal<List<DataModel>>
-) : Interactor<AppState> {
-    override suspend fun getData(word: String, fromRemoteSource: Boolean): AppState {
-        return AppState.Success(
+    private val repositoryRemote: com.example.repository.Repository<List<DataModel>>,
+    private val repositoryLocal: com.example.repository.RepositoryLocal<List<DataModel>>
+) : Interactor<com.example.model.AppState> {
+    override suspend fun getData(word: String, fromRemoteSource: Boolean): com.example.model.AppState {
+        return com.example.model.AppState.Success(
             if (fromRemoteSource) {
                 repositoryRemote
             } else {

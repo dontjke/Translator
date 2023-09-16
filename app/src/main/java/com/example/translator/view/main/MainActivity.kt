@@ -9,11 +9,10 @@ import androidx.lifecycle.Observer
 import com.example.translator.BuildConfig.BOTTOM_SHEET_FRAGMENT_DIALOG_TAG
 import com.example.translator.R
 import com.example.translator.databinding.ActivityMainBinding
-import com.example.translator.model.AppState
-import com.example.translator.model.data.DataModel
-import com.example.translator.utils.network.isOnline
-import com.example.translator.utils.ui.convertMeaningsToString
-import com.example.translator.view.base.BaseActivity
+import com.example.utils.network.isOnline
+import com.example.core.BaseActivity
+import com.example.model.AppState
+import com.example.model.data.DataModel
 import com.example.translator.view.description.DescriptionActivity
 import com.example.translator.view.history.HistoryActivity
 import com.example.translator.view.main.adapter.MainAdapter
@@ -42,8 +41,8 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
                     DescriptionActivity.getIntent(
                         this@MainActivity,
                         data.text!!,
-                        convertMeaningsToString(data.meanings!!),
-                        data.meanings[0].imageUrl
+                        com.example.repository.convertMeaningsToString(data.meanings!!),
+                        data.meanings!![0].imageUrl
                     )
                 )
             }
