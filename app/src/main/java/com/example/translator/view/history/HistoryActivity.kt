@@ -3,13 +3,12 @@ package com.example.translator.view.history
 import android.os.Bundle
 import androidx.lifecycle.Observer
 import com.example.translator.databinding.ActivityHistoryBinding
-import com.example.model.AppState
-import com.example.model.data.DataModel
 import com.example.core.BaseActivity
+import com.example.model.data.DataModel
+import com.example.model.dto.SearchResultDto
 import com.example.translator.viewmodel.history.HistoryInteractor
 import com.example.translator.viewmodel.history.HistoryViewModel
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class HistoryActivity : BaseActivity<com.example.model.AppState, HistoryInteractor>() {
@@ -31,7 +30,7 @@ class HistoryActivity : BaseActivity<com.example.model.AppState, HistoryInteract
         model.getData("", false)
     }
 
-    override fun setDataToAdapter(data: List<com.example.model.data.DataModel>) {
+    override fun setDataToAdapter(data: List<DataModel>) {
         adapter.setData(data)
     }
 

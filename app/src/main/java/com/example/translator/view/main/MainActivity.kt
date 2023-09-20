@@ -7,13 +7,13 @@ import android.view.MenuItem
 import android.view.View
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import com.example.translator.BuildConfig.BOTTOM_SHEET_FRAGMENT_DIALOG_TAG
-import com.example.translator.R
-import com.example.translator.databinding.ActivityMainBinding
-import com.example.utils.network.isOnline
 import com.example.core.BaseActivity
 import com.example.model.AppState
 import com.example.model.data.DataModel
+import com.example.repository.convertMeaningsToSingleString
+import com.example.translator.BuildConfig.BOTTOM_SHEET_FRAGMENT_DIALOG_TAG
+import com.example.translator.R
+import com.example.translator.databinding.ActivityMainBinding
 import com.example.translator.view.description.DescriptionActivity
 import com.example.translator.view.history.HistoryActivity
 import com.example.translator.view.main.adapter.MainAdapter
@@ -30,11 +30,6 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     override lateinit var model: MainViewModel
     private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
 
-    private val mainActivityRecyclerview by
-    viewById<RecyclerView>(R.id.main_activity_recyclerview)
-    private val searchFAB by viewById<FloatingActionButton>(R.id.search_fab)
-
-
     private val fabClickListener: View.OnClickListener =
         View.OnClickListener {
             val searchDialogFragment = SearchDialogFragment.newInstance()
@@ -49,7 +44,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
                     DescriptionActivity.getIntent(
                         this@MainActivity,
                         data.text!!,
-                        com.example.repository.convertMeaningsToString(data.meanings!!),
+                        convertMeaningsToSingleString(data.meanings!!),
                         data.meanings!![0].imageUrl
                     )
                 )
@@ -59,7 +54,6 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     private val onSearchClickListener: SearchDialogFragment.OnSearchClickListener =
         object : SearchDialogFragment.OnSearchClickListener {
             override fun onClick(searchWord: String) {
-                isNetworkAvailable = isOnline(applicationContext)
                 if (isNetworkAvailable) {
                     model.getData(searchWord, isNetworkAvailable)
                 } else {
@@ -108,10 +102,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     }
 
     private fun initViews() {
-        searchFAB.setOnClickListener(fabClickListener)
-        mainActivityRecyclerview.adapter = adapter
-
-      //  binding.searchFab.setOnClickListener(fabClickListener)
-       // binding.mainActivityRecyclerview.adapter = adapter
+        binding.searchFab.setOnClickListener(fabClickListener)
+        binding.mainActivityRecyclerview.adapter = adapter
     }
 }

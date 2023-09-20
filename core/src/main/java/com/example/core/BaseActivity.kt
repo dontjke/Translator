@@ -3,30 +3,36 @@ package com.example.core
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.View
+import android.widget.Toast
+import androidx.lifecycle.Observer
 import com.example.core.databinding.LoadingLayoutBinding
 import com.example.core.viewmodel.BaseViewModel
 import com.example.core.viewmodel.Interactor
 import com.example.model.AppState
-import com.example.utils.network.isOnline
+import com.example.model.data.DataModel
+import com.example.model.dto.SearchResultDto
+import com.example.utils.network.OnlineLiveData
 import com.example.utils.ui.AlertDialogFragment
 import org.koin.androidx.scope.ScopeActivity
 
 private const val DIALOG_FRAGMENT_TAG = "74a54328-5d62-46bf-ab6b-cbf5d8c79522"
+
 abstract class BaseActivity<T : AppState, I : Interactor<T>> : ScopeActivity() {
     private lateinit var binding: LoadingLayoutBinding
     abstract val model: BaseViewModel<T>
-    protected var isNetworkAvailable: Boolean = false
+    protected var isNetworkAvailable: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
-        isNetworkAvailable = isOnline(applicationContext)
+        subscribeToNetworkChange()
+
     }
 
     override fun onResume() {
         super.onResume()
         binding = LoadingLayoutBinding.inflate(layoutInflater)
 
-        isNetworkAvailable = isOnline(applicationContext)
+
         if (!isNetworkAvailable && isDialogNull()) {
             showNoInternetConnectionDialog()
         }
@@ -91,5 +97,21 @@ abstract class BaseActivity<T : AppState, I : Interactor<T>> : ScopeActivity() {
         return supportFragmentManager.findFragmentByTag(DIALOG_FRAGMENT_TAG) == null
     }
 
-    abstract fun setDataToAdapter(data: List<com.example.model.data.DataModel>)
+    abstract fun setDataToAdapter(data: List<DataModel>)
+
+    private fun subscribeToNetworkChange() {
+        OnlineLiveData(this).observe(
+            this@BaseActivity,
+            Observer<Boolean> {
+                isNetworkAvailable = it
+                if (!isNetworkAvailable) {
+                    Toast.makeText(
+                        this@BaseActivity,
+                        R.string.dialog_message_device_is_offline,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            })
+
+    }
 }

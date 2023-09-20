@@ -1,7 +1,7 @@
 package com.example.translator.di
 
 import androidx.room.Room
-import com.example.model.data.DataModel
+import com.example.model.dto.SearchResultDto
 import com.example.repository.Repository
 import com.example.repository.RepositoryImplementation
 import com.example.repository.RepositoryImplementationLocal
@@ -25,12 +25,12 @@ val application = module {
     single { Room.databaseBuilder(get(), HistoryDataBase::class.java, "HistoryDB").build() }
     single { get<HistoryDataBase>().historyDao() }
 
-    single<Repository<List<DataModel>>> {
+    single<Repository<List<SearchResultDto>>> {
         RepositoryImplementation(
             RetrofitImplementation()
         )
     }
-    single<RepositoryLocal<List<DataModel>>> {
+    single<RepositoryLocal<List<SearchResultDto>>> {
         RepositoryImplementationLocal(
             RoomDataBaseImplementation(get())
         )
