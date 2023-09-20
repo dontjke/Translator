@@ -18,7 +18,7 @@ import com.example.translator.view.history.HistoryActivity
 import com.example.translator.view.main.adapter.MainAdapter
 import com.example.translator.viewmodel.main.MainInteractor
 import com.example.translator.viewmodel.main.MainViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.android.ext.android.inject
 
 
 class MainActivity : BaseActivity<AppState, MainInteractor>() {
@@ -94,7 +94,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
             throw IllegalStateException("The ViewModel should be initialised first")
         }
 
-        val viewModel: MainViewModel by viewModel()
+        val viewModel: MainViewModel by inject()
         model = viewModel
         model.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
     }

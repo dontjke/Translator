@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_sheet_dialog_layout"
     android:layout_width="match_parent"
@@ -17,7 +16,7 @@
         android:layout_marginTop="@dimen/margin_medium"
         android:layout_marginEnd="@dimen/margin_medium"
         android:text="@string/button_search"
-        android:layout_gravity="end"/>
+        android:layout_gravity="end" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -37,7 +36,7 @@
                 android:id="@+id/search_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/BaseEditTextStyle"/>
+                style="@style/BaseEditTextStyle" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <ImageView
@@ -49,6 +48,6 @@
             android:src="@drawable/ic_delete_text"
             android:visibility="visible"
             tools:visibility="visible"
-            android:contentDescription="@string/delete_description"/>
+            android:contentDescription="@string/delete_description" />
     </FrameLayout>
 </LinearLayout>

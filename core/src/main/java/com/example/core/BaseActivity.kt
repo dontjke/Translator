@@ -3,16 +3,16 @@ package com.example.core
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import com.example.core.databinding.LoadingLayoutBinding
 import com.example.core.viewmodel.BaseViewModel
 import com.example.core.viewmodel.Interactor
 import com.example.model.AppState
 import com.example.utils.network.isOnline
 import com.example.utils.ui.AlertDialogFragment
+import org.koin.androidx.scope.ScopeActivity
 
 private const val DIALOG_FRAGMENT_TAG = "74a54328-5d62-46bf-ab6b-cbf5d8c79522"
-abstract class BaseActivity<T : AppState, I : Interactor<T>> : AppCompatActivity() {
+abstract class BaseActivity<T : AppState, I : Interactor<T>> : ScopeActivity() {
     private lateinit var binding: LoadingLayoutBinding
     abstract val model: BaseViewModel<T>
     protected var isNetworkAvailable: Boolean = false

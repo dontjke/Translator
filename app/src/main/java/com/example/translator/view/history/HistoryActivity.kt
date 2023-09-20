@@ -8,6 +8,7 @@ import com.example.model.data.DataModel
 import com.example.core.BaseActivity
 import com.example.translator.viewmodel.history.HistoryInteractor
 import com.example.translator.viewmodel.history.HistoryViewModel
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -38,7 +39,7 @@ class HistoryActivity : BaseActivity<com.example.model.AppState, HistoryInteract
         if (binding.historyActivityRecyclerview.adapter != null) {
             throw IllegalStateException("The ViewModel should be initialised first")
         }
-        val viewModel: HistoryViewModel by viewModel()
+        val viewModel: HistoryViewModel by inject()
         model = viewModel
         model.subscribe().observe(this@HistoryActivity, Observer<com.example.model.AppState> { renderData(it) })
     }

@@ -9,10 +9,16 @@ import com.example.repository.RepositoryLocal
 import com.example.repository.datasource.RetrofitImplementation
 import com.example.repository.datasource.RoomDataBaseImplementation
 import com.example.repository.room.HistoryDataBase
+import com.example.translator.view.history.HistoryActivity
+import com.example.translator.view.main.MainActivity
 import com.example.translator.viewmodel.history.HistoryInteractor
 import com.example.translator.viewmodel.history.HistoryViewModel
 import com.example.translator.viewmodel.main.MainInteractor
 import com.example.translator.viewmodel.main.MainViewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
+
+
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val application = module {
@@ -32,11 +38,15 @@ val application = module {
 }
 
 val mainScreen = module {
-    factory { MainInteractor(get(), get()) }
-    factory { MainViewModel(get()) }
+    scope(named<MainActivity>()) {
+        scoped { MainInteractor(get(), get()) }
+        viewModel { MainViewModel(get()) }
+    }
 }
 
 val historyScreen = module {
-    factory { HistoryViewModel(get()) }
-    factory { HistoryInteractor(get(), get()) }
+    scope(named<HistoryActivity>()) {
+        scoped { HistoryInteractor(get(), get()) }
+        viewModel { HistoryViewModel(get()) }
+    }
 }
