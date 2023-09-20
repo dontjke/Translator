@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.RecyclerView
 import com.example.translator.BuildConfig.BOTTOM_SHEET_FRAGMENT_DIALOG_TAG
 import com.example.translator.R
 import com.example.translator.databinding.ActivityMainBinding
@@ -18,6 +19,8 @@ import com.example.translator.view.history.HistoryActivity
 import com.example.translator.view.main.adapter.MainAdapter
 import com.example.translator.viewmodel.main.MainInteractor
 import com.example.translator.viewmodel.main.MainViewModel
+import com.example.utils.ui.viewById
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.koin.android.ext.android.inject
 
 
@@ -26,6 +29,11 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     private lateinit var binding: ActivityMainBinding
     override lateinit var model: MainViewModel
     private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
+
+    private val mainActivityRecyclerview by
+    viewById<RecyclerView>(R.id.main_activity_recyclerview)
+    private val searchFAB by viewById<FloatingActionButton>(R.id.search_fab)
+
 
     private val fabClickListener: View.OnClickListener =
         View.OnClickListener {
@@ -100,7 +108,10 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     }
 
     private fun initViews() {
-        binding.searchFab.setOnClickListener(fabClickListener)
-        binding.mainActivityRecyclerview.adapter = adapter
+        searchFAB.setOnClickListener(fabClickListener)
+        mainActivityRecyclerview.adapter = adapter
+
+      //  binding.searchFab.setOnClickListener(fabClickListener)
+       // binding.mainActivityRecyclerview.adapter = adapter
     }
 }
