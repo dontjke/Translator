@@ -1,8 +1,8 @@
 package com.example.translator.viewmodel.main
 
 import androidx.lifecycle.LiveData
-import com.example.repository.parseSearchResults
 import com.example.core.viewmodel.BaseViewModel
+import com.example.repository.parseOnlineSearchResults
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -24,7 +24,7 @@ class MainViewModel(private val interactor: MainInteractor) :
     private suspend fun startInteractor(word: String, isOnline: Boolean) =
         withContext(Dispatchers.IO) {
             _mutableLiveData.postValue(
-                com.example.repository.parseSearchResults(
+                parseOnlineSearchResults(
                     interactor.getData(
                         word,
                         isOnline

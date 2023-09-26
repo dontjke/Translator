@@ -6,19 +6,22 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.lifecycle.Observer
-import com.example.translator.BuildConfig.BOTTOM_SHEET_FRAGMENT_DIALOG_TAG
-import com.example.translator.R
-import com.example.translator.databinding.ActivityMainBinding
-import com.example.utils.network.isOnline
+import androidx.recyclerview.widget.RecyclerView
 import com.example.core.BaseActivity
 import com.example.model.AppState
 import com.example.model.data.DataModel
+import com.example.repository.convertMeaningsToSingleString
+import com.example.translator.BuildConfig.BOTTOM_SHEET_FRAGMENT_DIALOG_TAG
+import com.example.translator.R
+import com.example.translator.databinding.ActivityMainBinding
 import com.example.translator.view.description.DescriptionActivity
 import com.example.translator.view.history.HistoryActivity
 import com.example.translator.view.main.adapter.MainAdapter
 import com.example.translator.viewmodel.main.MainInteractor
 import com.example.translator.viewmodel.main.MainViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.example.utils.ui.viewById
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import org.koin.android.ext.android.inject
 
 
 class MainActivity : BaseActivity<AppState, MainInteractor>() {
@@ -41,7 +44,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
                     DescriptionActivity.getIntent(
                         this@MainActivity,
                         data.text!!,
-                        com.example.repository.convertMeaningsToString(data.meanings!!),
+                        convertMeaningsToSingleString(data.meanings!!),
                         data.meanings!![0].imageUrl
                     )
                 )
@@ -51,7 +54,6 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     private val onSearchClickListener: SearchDialogFragment.OnSearchClickListener =
         object : SearchDialogFragment.OnSearchClickListener {
             override fun onClick(searchWord: String) {
-                isNetworkAvailable = isOnline(applicationContext)
                 if (isNetworkAvailable) {
                     model.getData(searchWord, isNetworkAvailable)
                 } else {
@@ -94,7 +96,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
             throw IllegalStateException("The ViewModel should be initialised first")
         }
 
-        val viewModel: MainViewModel by viewModel()
+        val viewModel: MainViewModel by inject()
         model = viewModel
         model.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
     }
