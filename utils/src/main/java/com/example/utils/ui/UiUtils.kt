@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import com.example.utils.R
 
+const val SLIDE_LEFT_DURATION = 1000L
+const val COUNTDOWN_DURATION = 2000L
+const val COUNTDOWN_INTERVAL = 1000L
 fun getStubAlertDialog(context: Context): AlertDialog {
     return getAlertDialog(context, null, null)
 }

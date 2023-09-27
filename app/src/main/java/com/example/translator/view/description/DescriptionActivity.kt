@@ -2,10 +2,14 @@ package com.example.translator.view.description
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.RenderEffect
+import android.graphics.Shader
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ImageView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import coil.ImageLoader
@@ -81,8 +85,8 @@ class DescriptionActivity : AppCompatActivity() {
                         getString(R.string.dialog_title_device_is_offline),
                         getString(R.string.dialog_message_device_is_offline)
                     ).show(
-                    supportFragmentManager,
-                    DIALOG_FRAGMENT_TAG
+                        supportFragmentManager,
+                        DIALOG_FRAGMENT_TAG
                     )
                     stopRefreshAnimationIfNeeded()
                 }
@@ -143,7 +147,6 @@ class DescriptionActivity : AppCompatActivity() {
             )
             .into(imageView)
     }
-
     private fun useCoilToLoadPhoto(imageView: ImageView, imageLink: String) {
         val request = LoadRequest.Builder(this)
             .data("https:$imageLink")
@@ -151,6 +154,11 @@ class DescriptionActivity : AppCompatActivity() {
                 onStart = {},
                 onSuccess = { result ->
                     imageView.setImageDrawable(result)
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+                        val blurEffect = RenderEffect.createBlurEffect(15f, 0f, Shader.TileMode.MIRROR)
+                        imageView.setRenderEffect(blurEffect)
+                    }
                 },
                 onError = {
                     imageView.setImageResource(R.drawable.ic_load_error_vector)
